@@ -1,0 +1,26 @@
+# Готово для Render (на будущее). На free-плане сервис засыпает без трафика,
+# поэтому снаружи нужен пинг /health (например, Cron Trigger в Cloudflare).
+services:
+  - type: web
+    name: vavilong-bot
+    runtime: docker
+    plan: free
+    healthCheckPath: /health
+    autoDeploy: true
+    envVars:
+      - key: BOT_TOKEN
+        sync: false
+      - key: STATE_KEY
+        sync: false
+      - key: WEBAPP_URL
+        value: https://vavilong-tools.jpjgho.workers.dev
+      - key: PUBLIC_BASE_URL
+        value: https://vavilong-tools.jpjgho.workers.dev
+      - key: MAX_UPLOAD_MB
+        value: "49"
+      - key: MAX_CONCURRENT_DOWNLOADS
+        value: "2"
+      - key: PYTHONUNBUFFERED
+        value: "1"
+      - key: PYTHONIOENCODING
+        value: utf-8

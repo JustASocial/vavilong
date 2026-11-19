@@ -1,0 +1,1 @@
+{"root":["./src/app.tsx","./src/api.ts","./src/emoji.tsx","./src/i18n.ts","./src/main.tsx","./src/pack.ts","./src/telegram.ts","./src/components/emojifield.tsx","./src/components/emojipicker.tsx","./src/components/wirecube.tsx","./src/screens/builder.tsx","./src/screens/help.tsx","./src/screens/home.tsx","./src/screens/packs.tsx","./src/screens/studio.tsx"],"version":"5.9.3"}

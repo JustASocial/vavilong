@@ -1,0 +1,11 @@
+.env
+.dev.vars
+data/
+.venv/
+__pycache__/
+*.pyc
+*.log
+.tgcloud/
+node_modules/
+web/dist/
+.wrangler/
