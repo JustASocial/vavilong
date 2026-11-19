@@ -6,7 +6,7 @@ import logging
 from typing import Any, Awaitable, Callable
 
 from aiogram import BaseMiddleware
-from aiogram.types import CallbackQuery, InlineQuery, Message, TelegramObject, Update
+from aiogram.types import TelegramObject
 
 from app import database as db
 from app.i18n import detect_lang
@@ -19,6 +19,10 @@ class UserMiddleware(BaseMiddleware):
 
     Пользователь создаётся при первом апдейте, язык берётся из настроек,
     а если там пусто — из `language_code` Telegram.
+
+    Важно: middleware вешается на конкретные обсерверы (message, callback_query,
+    inline_query), а не на `dp.update`. Если подменить апдейт сообщением на
+    уровне update, aiogram 3.3x ломается на `update.event_type`.
     """
 
     async def __call__(
@@ -27,20 +31,9 @@ class UserMiddleware(BaseMiddleware):
         event: TelegramObject,
         data: dict[str, Any],
     ) -> Any:
-        if isinstance(event, Update):
-            inner = (
-                event.message
-                or event.callback_query
-                or event.inline_query
-                or event.edited_message
-                or event.chosen_inline_result
-            )
-            event = inner or event
-
         tg_user = getattr(event, "from_user", None)
         if tg_user is None:
-            if isinstance(event, (Message, CallbackQuery, InlineQuery)):
-                data.setdefault("l", "en")
+            data.setdefault("l", "en")
             return await handler(event, data)
 
         record = await db.get_user(

@@ -163,7 +163,6 @@ async def start_health(port: int):
 
 def build_dispatcher() -> Dispatcher:
     dp = Dispatcher(storage=MemoryStorage())
-    dp.update.outer_middleware(UserMiddleware())
 
     from app.handlers import download, inline, pack, quote, settings as settings_handlers, start
 
@@ -175,6 +174,12 @@ def build_dispatcher() -> Dispatcher:
     dp.include_router(download.router)
 
     dp.errors.register(on_error)
+
+    # Middleware ставим на конкретные типы апдейтов: подмена Update на Message
+    # внутри update-уровня ломает aiogram 3.3x.
+    for observer in (dp.message, dp.edited_message, dp.callback_query, dp.inline_query):
+        observer.outer_middleware(UserMiddleware())
+
     dp.shutdown.register(close_db)
     return dp
 
