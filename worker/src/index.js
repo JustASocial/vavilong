@@ -432,7 +432,8 @@ async function handleSticker(request, env) {
 }
 
 export default {
-  async fetch(request, env) {    const url = new URL(request.url);
+  async fetch(request, env) {
+    const url = new URL(request.url);
 
     if (url.pathname.startsWith("/api/")) {
       try {
@@ -452,5 +453,13 @@ export default {
       return env.ASSETS.fetch(request);
     }
     return new Response("Not found", { status: 404 });
+  },
+
+  // Render засыпает без входящего трафика: пинг держит бота в сети.
+  async scheduled(_controller, env, ctx) {
+    const url = env.BOT_HEALTH_URL || "https://vavilong-bot.onrender.com/health";
+    ctx.waitUntil(
+      fetch(url, { method: "GET", headers: { "user-agent": "vavilong-keepalive" } }).catch(() => {}),
+    );
   },
 };
