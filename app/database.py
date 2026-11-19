@@ -118,10 +118,13 @@ async def get_user(tg_id: int, username: str | None = None, first_name: str | No
     if row is None:
         prefs = json.dumps(DEFAULT_SETTINGS, ensure_ascii=False)
         await db.execute(
-            "INSERT INTO users (tg_id, username, first_name, created_at, settings) VALUES (?, ?, ?, ?, ?)",
+            "INSERT OR IGNORE INTO users (tg_id, username, first_name, created_at, settings)"
+            " VALUES (?, ?, ?, ?, ?)",
             (tg_id, username, first_name, int(time.time()), prefs),
         )
         await db.commit()
+        row = await (await db.execute("SELECT * FROM users WHERE tg_id = ?", (tg_id,))).fetchone()
+    if row is None:
         return {
             "tg_id": tg_id,
             "username": username,

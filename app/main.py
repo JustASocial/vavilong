@@ -116,8 +116,12 @@ async def set_menu_button(bot: Bot) -> None:
 async def on_error(event: ErrorEvent) -> bool:
     log.exception("Ошибка при обработке апдейта", exc_info=event.exception)
     update = event.update
-    message = update.message or (update.callback_query.message if update.callback_query else None)
-    if message is not None:
+    message = (
+        getattr(update, "message", None)
+        or getattr(getattr(update, "callback_query", None), "message", None)
+        or getattr(update, "edited_message", None)
+    )
+    if message is not None and hasattr(message, "answer"):
         try:
             await message.answer(
                 "Что-то сломалось на моей стороне. Попробуй ещё раз или пришли другую ссылку.\n"
